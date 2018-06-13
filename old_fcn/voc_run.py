@@ -16,7 +16,7 @@ from datetime import datetime
 
 from dataset import VOCDataSet
 from transform import ReLabel, ToLabel, ToSP, Scale, Colorize
-from utils import make_image_grid, make_label_grid, CrossEntropyLoss2d, compute_mean_iou
+from utils import make_image_grid, make_label_grid, CrossEntropyLoss2d, compute_mean_iou, FCN_metric
 from resnet import resnet101, resnet50
 from model import Seg
 
@@ -90,9 +90,11 @@ for t in range(50):
         writer.add_image('label', label, i)
         writer.add_image('pred', output, i)
         writer.add_scalar('loss', loss.data[0], i)
-        writer.add_scalar('iou', compute_mean_iou(output,label),i)
+        metric = FCN_metric(output, label)
+        writer.add_scalar('mIU',metric['MIU'],i)
+#         writer.add_scalar('iou', compute_mean_iou(output,label),i)
         if i % 100 is 0:
             print(output.shape)
             # plt.imshow(np.asarray(output))
 #             plt.show()
-        print("epoch %d step %d, loss=%.4f" %(t, i, loss.data.cpu()[0]))
+        print("epoch %d step %d, loss=%.4f, %s" %(t, i, loss.data.cpu()[0], metric))
