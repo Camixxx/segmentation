@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+data_dir = '../models/pytorch/'
 
 # https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py
 def get_upsampling_weight(in_channels, out_channels, kernel_size):
@@ -25,8 +26,7 @@ def get_upsampling_weight(in_channels, out_channels, kernel_size):
 
 class FCN32s(nn.Module):
 
-    pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn32s_from_caffe.pth')
+    pretrained_model = osp.expanduser( data_dir+'fcn32s_from_caffe.pth')
 
     @classmethod
     def download(cls):
@@ -36,6 +36,12 @@ class FCN32s(nn.Module):
             md5='8acf386d722dc3484625964cbe2aba49',
         )
 
+    
+    @classmethod
+    def _get_pretrained():
+        return pretrained_model
+
+    
     def __init__(self, n_class=21):
         super(FCN32s, self).__init__()
         # conv1

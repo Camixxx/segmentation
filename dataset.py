@@ -43,7 +43,8 @@ class VOCClassSegBase(data.Dataset):
         self._transform = transform
 
         # VOC2011 and others are subset of VOC2012
-        dataset_dir = osp.join(self.root, '/VOC/VOCdevkit/VOC2012')
+        
+        dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2012')
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(

@@ -6,10 +6,12 @@ import torch.nn as nn
 from .fcn32s import get_upsampling_weight
 
 
+data_dir = '../models/pytorch/'
+
+
 class FCN16s(nn.Module):
 
-    pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn16s_from_caffe.pth')
+    pretrained_model = osp.expanduser(data_dir+'fcn16s_from_caffe.pth')
 
     @classmethod
     def download(cls):
@@ -18,7 +20,13 @@ class FCN16s(nn.Module):
             path=cls.pretrained_model,
             md5='991ea45d30d632a01e5ec48002cac617',
         )
+    
+    
+    @classmethod
+    def _get_pretrained(self):
+        return pretrained_model
 
+    
     def __init__(self, n_class=21):
         super(FCN16s, self).__init__()
         # conv1

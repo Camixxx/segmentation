@@ -5,11 +5,12 @@ import torch.nn as nn
 
 from .fcn32s import get_upsampling_weight
 
+data_dir = '../models/pytorch/'
+
 
 class FCN8s(nn.Module):
 
-    pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn8s_from_caffe.pth')
+    pretrained_model = osp.expanduser(data_dir+'fcn8s_from_caffe.pth')
 
     @classmethod
     def download(cls):
@@ -18,7 +19,13 @@ class FCN8s(nn.Module):
             path=cls.pretrained_model,
             md5='dbd9bbb3829a3184913bccc74373afbb',
         )
+    
+    
+    @classmethod
+    def _get_pretrained():
+        return pretrained_model
 
+    
     def __init__(self, n_class=21):
         super(FCN8s, self).__init__()
         # conv1
@@ -171,9 +178,8 @@ class FCN8s(nn.Module):
 
 class FCN8sAtOnce(FCN8s):
 
-    pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn8s-atonce_from_caffe.pth')
-
+    pretrained_model = osp.expanduser(data_dir+'fcn8s-atonce_from_caffe.pth')
+    
     @classmethod
     def download(cls):
         return fcn.data.cached_download(
@@ -181,7 +187,13 @@ class FCN8sAtOnce(FCN8s):
             path=cls.pretrained_model,
             md5='bfed4437e941fef58932891217fe6464',
         )
-
+    
+    
+    @classmethod
+    def _get_pretrained():
+        return pretrained_model
+    
+    
     def forward(self, x):
         h = x
         h = self.relu1_1(self.conv1_1(h))
