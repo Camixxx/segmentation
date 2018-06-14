@@ -46,18 +46,29 @@ class VOCClassSegBase(data.Dataset):
         
         dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2012')
         self.files = collections.defaultdict(list)
-        for split in ['train', 'val']:
-            imgsets_file = osp.join(
-                dataset_dir, 'ImageSets/Segmentation/%s.txt' % split)
-            for did in open(imgsets_file):
-                did = did.strip()
-                img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
-                lbl_file = osp.join(
-                    dataset_dir, 'SegmentationClass/%s.png' % did)
-                self.files[split].append({
-                    'img': img_file,
-                    'lbl': lbl_file,
-                })
+#         for split in ['train', 'val']:
+#             imgsets_file = osp.join(
+#                 dataset_dir, 'ImageSets/Segmentation/%s.txt' % split)
+#             for did in open(imgsets_file):
+#                 did = did.strip()
+#                 img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
+#                 lbl_file = osp.join(
+#                     dataset_dir, 'SegmentationClass/%s.png' % did)
+#                 self.files[split].append({
+#                     'img': img_file,
+#                     'lbl': lbl_file,
+#                 })
+        imgsets_file = osp.join(
+        dataset_dir, 'ImageSets/Segmentation/%s.txt' % split)
+        for did in open(imgsets_file):
+            did = did.strip()
+            img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
+            lbl_file = osp.join(
+                dataset_dir, 'SegmentationClass/%s.png' % did)
+            self.files[split].append({
+                'img': img_file,
+                'lbl': lbl_file,
+            })
 
     def __len__(self):
         return len(self.files[self.split])

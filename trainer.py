@@ -14,7 +14,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import tqdm
 
-import torchfcn
+import utils
 
 
 def cross_entropy2d(input, target, weight=None, size_average=True):
@@ -44,7 +44,7 @@ class Trainer(object):
 
     def __init__(self, cuda, model, optimizer,
                  train_loader, val_loader, out, max_iter,
-                 size_average=False, interval_validate=None):
+                 size_average=False, interval_validate=1000):
         self.cuda = cuda
 
         self.model = model
@@ -121,19 +121,18 @@ class Trainer(object):
                 img, lt = self.val_loader.dataset.untransform(img, lt)
                 label_trues.append(lt)
                 label_preds.append(lp)
-                if len(visualizations) < 9:
-                    viz = fcn.utils.visualize_segmentation(
-                        lbl_pred=lp, lbl_true=lt, img=img, n_class=n_class)
-                    visualizations.append(viz)
-        metrics = torchfcn.utils.label_accuracy_score(
-            label_trues, label_preds, n_class)
+#                 if len(visualizations) < 9:
+#                     viz = fcn.utils.visualize_segmentation(
+#                         lbl_pred=lp, lbl_true=lt, img=img, n_class=n_class)
+#                     visualizations.append(viz)
+#                     visualizations.append(img)
+        metrics = utils.label_accuracy_score(label_trues, label_preds, n_class)
 
         out = osp.join(self.out, 'visualization_viz')
         if not osp.exists(out):
             os.makedirs(out)
         out_file = osp.join(out, 'iter%012d.jpg' % self.iteration)
-        scipy.misc.imsave(out_file, fcn.utils.get_tile_image(visualizations))
-
+#         scipy.misc.imsave(out_file, fcn.utils.get_tile_image(visualizations))
         val_loss /= len(self.val_loader)
 
         with open(osp.join(self.out, 'log.csv'), 'a') as f:
@@ -178,7 +177,8 @@ class Trainer(object):
             self.iteration = iteration
 
             if self.iteration % self.interval_validate == 0:
-                self.validate()
+                if self.iteration > 0:
+                    self.validate()
 
             assert self.model.training
 
@@ -188,8 +188,7 @@ class Trainer(object):
             self.optim.zero_grad()
             score = self.model(data)
 
-            loss = cross_entropy2d(score, target,
-                                   size_average=self.size_average)
+            loss = cross_entropy2d(score, target, size_average=self.size_average)
             loss /= len(data)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')
@@ -200,11 +199,12 @@ class Trainer(object):
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
             lbl_true = target.data.cpu().numpy()
             acc, acc_cls, mean_iu, fwavacc = \
-                torchfcn.utils.label_accuracy_score(
+                utils.label_accuracy_score(
                     lbl_true, lbl_pred, n_class=n_class)
             metrics.append((acc, acc_cls, mean_iu, fwavacc))
+            print(metrics)
             metrics = np.mean(metrics, axis=0)
-
+            
             with open(osp.join(self.out, 'log.csv'), 'a') as f:
                 elapsed_time = (
                     datetime.datetime.now(pytz.timezone('Asia/Tokyo')) -
