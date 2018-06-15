@@ -1,5 +1,8 @@
 #
+*.pth
 runs/
+logs/
+checkpoint/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
